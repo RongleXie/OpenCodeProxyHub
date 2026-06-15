@@ -35,7 +35,7 @@ OpenCodeProxyHub 默认内置以下免费模型，均可通过 OpenAI 兼容接�
 | `mimo-v2.5-free` | Mimo v2.5 免费模型 |
 | `north-mini-code-free` | Cohere North Mini Code 免费模型 |
 
-新部署会自动生成以上默认模型；已有部署升级后，缺失的默认免费模型会自动追加到已有 `models.json`，不会覆盖用户已修改的模型配置。已下线的模型（如 `nemotron-3-super-free`、`minimax-m3-free`）会在升级时自动禁用。
+新部署会自动生成以上默认模型；已有部署升级后，缺失的默认免费模型会自动追加到已有 `models.json`，不会覆盖用户已修改的模型配置。已下线的模型（如 `nemotron-3-super-free`、`minimax-m3-free`）会在升级时自动禁用并标记下线原因，用户无需手动清理。
 
 ## 部署方式
 
@@ -117,7 +117,7 @@ npm start            # 运行已构建的 dist/main.js
   - OpenAI 兼容：`POST /v1/chat/completions`、`GET /v1/models`
   - Anthropic 兼容：`POST /v1/messages`
   - 同时支持流式（SSE）与非流式
-- **默认免费模型**：内置 6 个可用免费模型，详见上方“可用免费模型”
+- **默认免费模型**：内置 5 个可用免费模型，详见上方“可用免费模型”
 - **流式归一化转换（可按模型开启）**
   - `anthropic-sse-to-openai`：把上游的 Anthropic 风格 SSE 转成 OpenAI 风格 SSE
   - `think-to-reasoning`：把内联在 `delta.content` 里的 `<think>...</think>` 推理内容抽取到 `reasoning_content` 字段，正文只保留答案（支持标签跨 chunk 的状态机处理）
@@ -366,7 +366,7 @@ curl -X POST http://127.0.0.1:6446/admin/api-keys \
 curl -X PATCH http://127.0.0.1:6446/admin/settings \
   -H "Authorization: Bearer YOUR_ADMIN_PASSWORD" \
   -H "Content-Type: application/json" \
-  -d '{"reasoningTagModels":["north-mini-code-free"]}'
+  -d '{"reasoningTagModels":["deepseek-v4-flash-free"]}'
 ```
 
 ## 本地数据文件
@@ -431,3 +431,12 @@ MIT 许可证仅适用于本项目源代码本身，**不授予**使用任何第
 OpenCodeProxyHub 复现并扩展了原项目的核心兼容行为（OpenAI/Anthropic 兼容接口、OpenCode Zen 上游转发、`x-opencode-*` 请求头、模型兼容与消息转换思路），并在此基础上重写与扩展为：TypeScript/Fastify 架构、React Web 控制台、API Key 管理、代理池与链式代理、限流、可观测性与 Docker 部署。
 
 OpenCodeProxyHub 独立维护，与 OpenCode、`opencode-free-proxy` 及任何上游服务方均无隶属关系。
+
+## 更新记录
+
+- **v0.1.2**：移除已下线的 `nemotron-3-super-free` 和 `minimax-m3-free`，新增 `north-mini-code-free`；升级时自动禁用已下线模型
+- **v0.1.1**：新增 Nemotron 3 Ultra 默认模型、运行时代理模式
+- **v0.1.0**：初始发布
+
+完整变更记录见 Git 提交历史。
+
