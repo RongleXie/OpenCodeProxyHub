@@ -31,12 +31,11 @@ OpenCodeProxyHub 默认内置以下免费模型，均可通过 OpenAI 兼容接�
 |--------|------|
 | `deepseek-v4-flash-free` | DeepSeek 免费模型 |
 | `big-pickle` | OpenCode 免费模型 |
-| `nemotron-3-super-free` | Nvidia Nemotron 3 Super 免费模型 |
 | `nemotron-3-ultra-free` | Nvidia Nemotron 3 Ultra 免费模型 |
 | `mimo-v2.5-free` | Mimo v2.5 免费模型 |
-| `minimax-m3-free` | MiniMax M3 免费模型 |
+| `north-mini-code-free` | Cohere North Mini Code 免费模型 |
 
-新部署会自动生成以上默认模型；已有部署升级后，缺失的默认免费模型会自动追加到已有 `models.json`，不会覆盖用户已修改的模型配置。
+新部署会自动生成以上默认模型；已有部署升级后，缺失的默认免费模型会自动追加到已有 `models.json`，不会覆盖用户已修改的模型配置。已下线的模型（如 `nemotron-3-super-free`、`minimax-m3-free`）会在升级时自动禁用。
 
 ## 部署方式
 
@@ -242,7 +241,7 @@ curl -N http://127.0.0.1:6446/v1/chat/completions \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "minimax-m3-free",
+    "model": "north-mini-code-free",
     "stream": true,
     "messages": [{"role": "user", "content": "用一句话介绍你自己"}]
   }'
@@ -367,7 +366,7 @@ curl -X POST http://127.0.0.1:6446/admin/api-keys \
 curl -X PATCH http://127.0.0.1:6446/admin/settings \
   -H "Authorization: Bearer YOUR_ADMIN_PASSWORD" \
   -H "Content-Type: application/json" \
-  -d '{"reasoningTagModels":["minimax-m3-free"]}'
+  -d '{"reasoningTagModels":["north-mini-code-free"]}'
 ```
 
 ## 本地数据文件

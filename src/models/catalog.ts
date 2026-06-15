@@ -3,11 +3,19 @@
 export const DEFAULT_MODELS = [
   "deepseek-v4-flash-free",
   "big-pickle",
-  "nemotron-3-super-free",
   "nemotron-3-ultra-free",
   "mimo-v2.5-free",
-  "minimax-m3-free",
+  "north-mini-code-free",
 ] as const;
+
+/**
+ * Models that have been retired by upstream and should be auto-disabled on
+ * startup so existing deployments don't encounter 401 errors after upgrade.
+ */
+export const RETIRED_MODELS: ReadonlyArray<{ id: string; reason: string }> = [
+  { id: "nemotron-3-super-free", reason: "Model no longer supported by upstream" },
+  { id: "minimax-m3-free", reason: "Free promotion ended, now requires OpenCode Go subscription" },
+];
 
 export interface ModelConfig {
   id: string;
@@ -95,6 +103,14 @@ export class ModelConfigStore {
     const existingIds = new Set(merged.map((model) => model.id));
     for (const model of this.defaultModels()) {
       if (!existingIds.has(model.id)) merged.push(model);
+    }
+    // Auto-disable retired models on startup
+    for (const retired of RETIRED_MODELS) {
+      const model = merged.find((m) => m.id === retired.id);
+      if (model && model.enabled) {
+        model.enabled = false;
+        model.displayName = `${model.displayName || model.id} (retired: ${retired.reason})`;
+      }
     }
     return merged;
   }
