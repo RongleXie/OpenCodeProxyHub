@@ -1,4 +1,10 @@
-import { Boxes, Cable, Route, ServerCog, ShieldCheck, Workflow } from "lucide-react";
+import { motion } from "motion/react";
+import { ArrowRight, Boxes, Cable, Route, ServerCog, ShieldCheck } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { fadeUp, staggerContainer } from "@/lib/motion";
 import type { ConsoleData } from "../hooks/useConsoleData";
 import type { View } from "../types";
 
@@ -15,65 +21,92 @@ export function DashboardView({ data, onSelect }: { data: ConsoleData; onSelect:
   const enabledKeys = apiKeys.filter((k) => k.enabled).length;
 
   return (
-    <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-      <div className="card bg-base-100 shadow-sm lg:col-span-2">
-        <div className="card-body">
-          <h2 className="card-title text-base">网关拓扑</h2>
-          <div className="mt-2 flex flex-wrap items-center gap-3">
+    <motion.div
+      variants={staggerContainer}
+      initial="hidden"
+      animate="show"
+      className="grid grid-cols-1 gap-4 lg:grid-cols-3"
+    >
+      <motion.div variants={fadeUp} className="lg:col-span-2">
+        <Card className="h-full p-5">
+          <h2 className="text-sm font-semibold">网关拓扑</h2>
+          <p className="mt-1 text-xs text-muted-foreground">请求自客户端经网关、可选前置代理抵达 Zen 上游</p>
+          <motion.div
+            variants={staggerContainer}
+            className="mt-5 flex flex-wrap items-center gap-3"
+          >
             {flow.map((node, idx) => {
               const Icon = node.icon;
               return (
-                <div className="flex items-center gap-3" key={node.title}>
-                  <div className="flex w-32 flex-col items-center gap-1 rounded-xl border border-base-300 bg-base-200/50 p-3 text-center">
-                    <Icon size={22} className="text-primary" />
+                <motion.div key={node.title} variants={fadeUp} className="flex items-center gap-3">
+                  <div className="flex w-32 flex-col items-center gap-1.5 rounded-lg border border-border bg-muted/40 p-3 text-center">
+                    <span className="grid h-9 w-9 place-items-center rounded-md bg-primary/15 text-primary ring-1 ring-inset ring-primary/20">
+                      <Icon size={18} />
+                    </span>
                     <span className="text-sm font-medium">{node.title}</span>
-                    <span className="text-[11px] leading-tight text-base-content/50">{node.sub}</span>
+                    <span className="text-[11px] leading-tight text-muted-foreground">{node.sub}</span>
                   </div>
-                  {idx < flow.length - 1 && <Workflow size={16} className="text-base-content/30" />}
-                </div>
+                  {idx < flow.length - 1 && <ArrowRight size={16} className="text-muted-foreground/60" />}
+                </motion.div>
               );
             })}
-          </div>
-        </div>
-      </div>
+          </motion.div>
+        </Card>
+      </motion.div>
 
-      <div className="card bg-base-100 shadow-sm">
-        <div className="card-body">
+      <motion.div variants={fadeUp}>
+        <Card className="h-full p-5">
           <div className="flex items-center justify-between">
-            <h2 className="card-title text-base">
-              <ShieldCheck size={18} className="text-primary" /> 摘要
+            <h2 className="flex items-center gap-2 text-sm font-semibold">
+              <ShieldCheck size={16} className="text-primary" /> 摘要
             </h2>
-            <button className="btn btn-ghost btn-xs" onClick={() => onSelect("keys")}>
+            <Button variant="ghost" size="sm" onClick={() => onSelect("keys")}>
               管理
-            </button>
+            </Button>
           </div>
-          <div className="mt-2 grid grid-cols-2 gap-3">
-            <div className="oph-inset p-3">
-              <div className="text-xs text-base-content/50">API Key</div>
-              <div className="text-xl font-bold">
+          <div className="mt-4 grid grid-cols-2 gap-3">
+            <div className="surface-inset p-3">
+              <div className="text-xs text-muted-foreground">API Key</div>
+              <div className="mt-1 text-xl font-semibold tabular-nums">
                 {enabledKeys}
-                <span className="text-sm font-normal text-base-content/40">/{apiKeys.length}</span>
+                <span className="text-sm font-normal text-muted-foreground">/{apiKeys.length}</span>
               </div>
+              <MiniBar ratio={apiKeys.length ? enabledKeys / apiKeys.length : 0} tone="primary" />
             </div>
-            <div className="oph-inset p-3">
-              <div className="text-xs text-base-content/50">启用模型</div>
-              <div className="text-xl font-bold">
+            <div className="surface-inset p-3">
+              <div className="text-xs text-muted-foreground">启用模型</div>
+              <div className="mt-1 text-xl font-semibold tabular-nums">
                 {enabledModels}
-                <span className="text-sm font-normal text-base-content/40">/{models.length}</span>
+                <span className="text-sm font-normal text-muted-foreground">/{models.length}</span>
               </div>
+              <MiniBar ratio={models.length ? enabledModels / models.length : 0} tone="success" />
             </div>
           </div>
-          <div className="mt-3 space-y-2">
+          <div className="mt-4 space-y-2">
             {apiKeys.slice(0, 4).map((key) => (
               <div key={key.id} className="flex items-center justify-between text-sm">
-                <span className="truncate">{key.name}</span>
-                <span className={`badge badge-sm ${key.enabled ? "badge-success" : "badge-ghost"}`}>{key.enabled ? "启用" : "禁用"}</span>
+                <span className="truncate text-foreground/80">{key.name}</span>
+                <Badge variant={key.enabled ? "success" : "muted"}>{key.enabled ? "启用" : "禁用"}</Badge>
               </div>
             ))}
-            {apiKeys.length === 0 && <p className="text-sm text-base-content/40">暂无 API Key</p>}
+            {apiKeys.length === 0 && <p className="text-sm text-muted-foreground/70">暂无 API Key</p>}
           </div>
-        </div>
-      </div>
+        </Card>
+      </motion.div>
+    </motion.div>
+  );
+}
+
+function MiniBar({ ratio, tone }: { ratio: number; tone: "primary" | "success" }) {
+  return (
+    <div className="mt-2 h-1 w-full overflow-hidden rounded-full bg-muted">
+      <motion.div
+        className={cn("h-full rounded-full", tone === "primary" ? "bg-primary" : "bg-success")}
+        initial={false}
+        animate={{ transform: `scaleX(${Math.min(1, ratio)})` }}
+        style={{ transformOrigin: "left" }}
+        transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+      />
     </div>
   );
 }

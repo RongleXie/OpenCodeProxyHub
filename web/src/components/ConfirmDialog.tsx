@@ -1,4 +1,14 @@
 import { AlertTriangle } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogFooter,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogAction,
+  AlertDialogCancel,
+} from "@/components/ui/alert-dialog";
 
 interface ConfirmDialogProps {
   open: boolean;
@@ -11,26 +21,44 @@ interface ConfirmDialogProps {
   onCancel: () => void;
 }
 
-export function ConfirmDialog({ open, title, message, confirmText = "确认", danger = true, busy = false, onConfirm, onCancel }: ConfirmDialogProps) {
-  if (!open) return null;
+export function ConfirmDialog({
+  open,
+  title,
+  message,
+  confirmText = "确认",
+  danger = true,
+  busy = false,
+  onConfirm,
+  onCancel,
+}: ConfirmDialogProps) {
   return (
-    <div className="modal modal-open">
-      <div className="modal-box">
-        <h3 className="flex items-center gap-2 text-lg font-semibold">
-          <AlertTriangle size={20} className={danger ? "text-error" : "text-warning"} />
-          {title}
-        </h3>
-        <p className="py-4 text-sm text-base-content/70">{message}</p>
-        <div className="modal-action">
-          <button className="btn btn-ghost btn-sm" onClick={onCancel} disabled={busy}>
+    <AlertDialog
+      open={open}
+      onOpenChange={(v) => {
+        if (!v) onCancel();
+      }}
+    >
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle className="flex items-center gap-2">
+            <AlertTriangle size={18} className={danger ? "text-destructive" : "text-warning"} />
+            {title}
+          </AlertDialogTitle>
+          <AlertDialogDescription>{message}</AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel onClick={onCancel} disabled={busy}>
             取消
-          </button>
-          <button className={`btn btn-sm ${danger ? "btn-error" : "btn-primary"}`} onClick={onConfirm} disabled={busy}>
+          </AlertDialogCancel>
+          <AlertDialogAction
+            variant={danger ? "destructive" : "default"}
+            disabled={busy}
+            onClick={onConfirm}
+          >
             {confirmText}
-          </button>
-        </div>
-      </div>
-      <div className="modal-backdrop bg-black/40" onClick={onCancel} />
-    </div>
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }

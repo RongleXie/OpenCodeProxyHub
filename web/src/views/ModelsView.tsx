@@ -1,4 +1,11 @@
+import { motion } from "motion/react";
 import { Activity } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import { cn } from "@/lib/utils";
+import { fadeIn, fadeUp, staggerContainer } from "@/lib/motion";
 import type { ConsoleData } from "../hooks/useConsoleData";
 
 export function ModelsView({ data }: { data: ConsoleData }) {
@@ -6,64 +13,96 @@ export function ModelsView({ data }: { data: ConsoleData }) {
 
   return (
     <div className="space-y-4">
-      <div className="alert bg-base-100 shadow-sm">
-        <Activity size={18} className="text-primary" />
-        <span className="text-sm text-base-content/70">OpenAI 流式转换会把白名单模型的 Anthropic SSE 转为 ChatCompletions SSE；保存后热重载，新请求立即生效。</span>
-      </div>
+      <motion.div variants={fadeIn} initial="hidden" animate="show">
+        <Card className="flex items-start gap-3 border-primary/20 bg-primary/[0.06] p-4">
+          <span className="grid h-8 w-8 shrink-0 place-items-center rounded-md bg-primary/15 text-primary">
+            <Activity size={16} />
+          </span>
+          <p className="text-sm text-muted-foreground">
+            OpenAI 流式转换会把白名单模型的 Anthropic SSE 转为 ChatCompletions SSE；保存后热重载，新请求立即生效。
+          </p>
+        </Card>
+      </motion.div>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+      <motion.div
+        variants={staggerContainer}
+        initial="hidden"
+        animate="show"
+        className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3"
+      >
         {models.map((model) => {
           const transformEnabled = Boolean(settings?.openAiStreamTransformModels?.includes(model.id));
           const reasoningEnabled = Boolean(settings?.reasoningTagModels?.includes(model.id));
           return (
-            <div key={model.id} className={`card bg-base-100 shadow-sm ${model.enabled ? "" : "opacity-60"}`}>
-              <div className="card-body gap-3 p-4">
+            <motion.div key={model.id} variants={fadeUp}>
+              <Card className={cn("h-full p-4", !model.enabled && "opacity-60")}>
                 <div className="flex items-start justify-between gap-2">
                   <code className="break-all text-sm font-semibold">{model.id}</code>
-                  <span className={`badge badge-sm shrink-0 ${model.enabled ? "badge-success" : "badge-ghost"}`}>{model.enabled ? "启用" : "禁用"}</span>
+                  <Badge variant={model.enabled ? "success" : "muted"} className="shrink-0">
+                    {model.enabled ? "启用" : "禁用"}
+                  </Badge>
                 </div>
-                <div className="flex gap-3 text-xs text-base-content/50">
+                <div className="mt-2 flex gap-3 text-xs text-muted-foreground">
                   <span>{model.ownedBy}</span>
-                  <span>{model.created}</span>
+                  <span className="tabular-nums">{model.created}</span>
                 </div>
 
-                <label className="oph-inset flex cursor-pointer items-start gap-2 p-2">
-                  <input
-                    type="checkbox"
-                    className="toggle toggle-primary toggle-sm mt-0.5"
-                    disabled={busy || !settings}
+                <div className="mt-4 space-y-2">
+                  <SettingRow
+                    title="OpenAI 流式转换"
+                    desc={transformEnabled ? "Anthropic SSE → OpenAI SSE" : "直通上游流式响应"}
                     checked={transformEnabled}
-                    onChange={() => toggleOpenAiStreamTransform(model)}
-                  />
-                  <span className="text-xs">
-                    <strong className="block">OpenAI 流式转换</strong>
-                    <span className="text-base-content/50">{transformEnabled ? "Anthropic SSE → OpenAI SSE" : "直通上游流式响应"}</span>
-                  </span>
-                </label>
-
-                <label className="oph-inset flex cursor-pointer items-start gap-2 p-2">
-                  <input
-                    type="checkbox"
-                    className="toggle toggle-primary toggle-sm mt-0.5"
                     disabled={busy || !settings}
-                    checked={reasoningEnabled}
-                    onChange={() => toggleReasoningTag(model)}
+                    onToggle={() => toggleOpenAiStreamTransform(model)}
                   />
-                  <span className="text-xs">
-                    <strong className="block">思考标签抽取</strong>
-                    <span className="text-base-content/50">{reasoningEnabled ? "<think> → reasoning_content" : "content 内含 <think> 原样直通"}</span>
-                  </span>
-                </label>
+                  <SettingRow
+                    title="思考标签抽取"
+                    desc={reasoningEnabled ? "流式抽取到 reasoning_content" : "content 内含标签原样直通"}
+                    checked={reasoningEnabled}
+                    disabled={busy || !settings}
+                    onToggle={() => toggleReasoningTag(model)}
+                  />
+                </div>
 
-                <button className="btn btn-outline btn-sm" disabled={busy} onClick={() => toggleModel(model)}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="mt-4 w-full"
+                  disabled={busy}
+                  onClick={() => toggleModel(model)}
+                >
                   {model.enabled ? "禁用模型" : "启用模型"}
-                </button>
-              </div>
-            </div>
+                </Button>
+              </Card>
+            </motion.div>
           );
         })}
-        {models.length === 0 && <p className="text-sm text-base-content/40">暂无模型</p>}
+        {models.length === 0 && <p className="text-sm text-muted-foreground/70">暂无模型</p>}
+      </motion.div>
+    </div>
+  );
+}
+
+function SettingRow({
+  title,
+  desc,
+  checked,
+  disabled,
+  onToggle,
+}: {
+  title: string;
+  desc: string;
+  checked: boolean;
+  disabled?: boolean;
+  onToggle: () => void;
+}) {
+  return (
+    <div className="flex items-start justify-between gap-3 rounded-md border border-border bg-muted/30 p-3">
+      <div className="min-w-0">
+        <div className="text-xs font-medium text-foreground">{title}</div>
+        <div className="mt-0.5 text-[11px] text-muted-foreground">{desc}</div>
       </div>
+      <Switch checked={checked} disabled={disabled} onCheckedChange={onToggle} />
     </div>
   );
 }

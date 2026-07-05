@@ -1,5 +1,9 @@
 import { useState } from "react";
-import { Radar } from "lucide-react";
+import { motion } from "motion/react";
+import { Radar, ShieldCheck } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 interface LoginViewProps {
   draftToken: string;
@@ -15,57 +19,68 @@ export function LoginView({ draftToken, setDraftToken, busy, error, onLogin, che
 
   if (checking) {
     return (
-      <div className="grid min-h-screen place-items-center bg-base-200 p-4">
-        <div className="card w-full max-w-md bg-base-100 shadow-xl">
-          <div className="card-body items-center text-center">
-            <span className="loading loading-ring loading-lg text-primary" />
-            <p className="text-sm text-base-content/60">正在验证控制台凭据…</p>
-          </div>
+      <div className="grid min-h-dvh place-items-center p-4">
+        <div className="flex flex-col items-center gap-3">
+          <span className="h-8 w-8 rounded-full border-2 border-primary/25 border-t-primary animate-spin" />
+          <p className="text-sm text-muted-foreground">正在验证控制台凭据…</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="grid min-h-screen place-items-center bg-base-200 p-4">
-      <form
-        className="card w-full max-w-md bg-base-100 shadow-xl"
+    <div className="relative grid min-h-dvh place-items-center overflow-hidden p-4">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(800px_420px_at_50%_-12%,rgba(94,106,210,0.2),transparent_60%)]" />
+      <motion.form
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+        className="relative w-full max-w-md rounded-xl border border-border bg-card/80 p-7 shadow-2xl shadow-black/40 backdrop-blur"
         onSubmit={(event) => {
           event.preventDefault();
           setDraftToken(local);
           onLogin(local);
         }}
       >
-        <div className="card-body gap-4">
-          <div className="flex items-center gap-3">
-            <div className="grid h-12 w-12 place-items-center rounded-2xl bg-primary text-primary-content">
-              <Radar size={26} />
-            </div>
-            <div>
-              <h1 className="text-xl font-bold">OpenCodeProxyHub</h1>
-              <p className="text-xs text-base-content/50">管理控制台登录</p>
-            </div>
+        <div className="mb-6 flex items-center gap-3">
+          <div className="grid h-11 w-11 place-items-center rounded-lg bg-gradient-to-br from-primary to-primary/60 text-primary-content shadow-lg shadow-primary/30">
+            <Radar size={22} />
           </div>
-          <p className="text-sm text-base-content/60">
-            输入控制台密码后进入管理页面。初始密码为 <code className="rounded bg-base-200 px-1">admin</code>，建议在 Docker 环境变量中修改 ADMIN_PASSWORD。
-          </p>
-          <label className="form-control w-full">
-            <span className="label-text mb-1 text-sm">控制台密码</span>
-            <input
-              className="input input-bordered w-full"
-              value={local}
-              onChange={(event) => setLocal(event.target.value)}
-              placeholder="输入控制台密码"
-              type="password"
-              autoFocus
-            />
-          </label>
-          {error && <p className="text-sm text-error">{error}</p>}
-          <button className="btn btn-primary" type="submit" disabled={busy}>
-            {busy ? <span className="loading loading-spinner loading-sm" /> : "进入控制台"}
-          </button>
+          <div>
+            <h1 className="text-lg font-semibold tracking-tight">OpenCodeProxyHub</h1>
+            <p className="text-xs text-muted-foreground">管理控制台登录</p>
+          </div>
         </div>
-      </form>
+        <p className="mb-5 text-sm text-muted-foreground">
+          输入控制台密码进入管理页面。初始密码为{" "}
+          <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-[12px] text-foreground/80">admin</code>
+          ，建议在 Docker 环境变量中修改 ADMIN_PASSWORD。
+        </p>
+        <div className="space-y-2">
+          <Label htmlFor="login-pw">控制台密码</Label>
+          <Input
+            id="login-pw"
+            type="password"
+            value={local}
+            onChange={(e) => setLocal(e.target.value)}
+            placeholder="输入控制台密码"
+            autoFocus
+          />
+        </div>
+        {error && (
+          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-3 text-sm text-destructive">
+            {error}
+          </motion.p>
+        )}
+        <Button type="submit" className="mt-5 w-full" disabled={busy}>
+          {busy ? (
+            <span className="h-4 w-4 rounded-full border-2 border-primary-foreground/30 border-t-primary-foreground animate-spin" />
+          ) : (
+            <ShieldCheck size={16} />
+          )}
+          进入控制台
+        </Button>
+      </motion.form>
     </div>
   );
 }

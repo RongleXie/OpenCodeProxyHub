@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { AnimatePresence, motion } from "motion/react";
 import "./styles.css";
 import type { View } from "./types";
 import { useConsoleData } from "./hooks/useConsoleData";
@@ -24,13 +25,28 @@ export default function App() {
   }, [data.metricsData]);
 
   if (!data.authChecked && !data.token) {
-    return <LoginView checking draftToken={data.draftToken} setDraftToken={data.setDraftToken} busy={data.busy} error={data.loginError} onLogin={data.login} />;
+    return (
+      <LoginView
+        checking
+        draftToken={data.draftToken}
+        setDraftToken={data.setDraftToken}
+        busy={data.busy}
+        error={data.loginError}
+        onLogin={data.login}
+      />
+    );
   }
 
   if (!data.token) {
     return (
       <>
-        <LoginView draftToken={data.draftToken} setDraftToken={data.setDraftToken} busy={data.busy} error={data.loginError} onLogin={data.login} />
+        <LoginView
+          draftToken={data.draftToken}
+          setDraftToken={data.setDraftToken}
+          busy={data.busy}
+          error={data.loginError}
+          onLogin={data.login}
+        />
         <Toasts toasts={data.toasts} onDismiss={data.dismissToast} />
       </>
     );
@@ -56,13 +72,25 @@ export default function App() {
         onRefresh={data.refresh}
         onLogout={() => data.logout()}
       >
-        <StatCards items={stats} />
-        {view === "dashboard" && <DashboardView data={data} onSelect={setView} />}
-        {view === "keys" && <KeysView data={data} />}
-        {view === "models" && <ModelsView data={data} />}
-        {view === "settings" && <SettingsView data={data} />}
-        {view === "proxy" && <ProxyView data={data} />}
-        {view === "monitor" && <MonitorView data={data} />}
+        <div className="space-y-6">
+          <StatCards items={stats} />
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={view}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
+            >
+              {view === "dashboard" && <DashboardView data={data} onSelect={setView} />}
+              {view === "keys" && <KeysView data={data} />}
+              {view === "models" && <ModelsView data={data} />}
+              {view === "settings" && <SettingsView data={data} />}
+              {view === "proxy" && <ProxyView data={data} />}
+              {view === "monitor" && <MonitorView data={data} />}
+            </motion.div>
+          </AnimatePresence>
+        </div>
       </Layout>
       <Toasts toasts={data.toasts} onDismiss={data.dismissToast} />
     </>

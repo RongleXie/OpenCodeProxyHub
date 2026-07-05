@@ -1,12 +1,32 @@
 import { useMemo, useState } from "react";
+import { motion } from "motion/react";
 import { Copy, KeyRound, Pencil, Plus, ShieldCheck, SlidersHorizontal, Trash2 } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { cn } from "@/lib/utils";
+import { fadeUp, staggerContainer } from "@/lib/motion";
 import type { ConsoleData } from "../hooks/useConsoleData";
 import type { ApiKeyItem, ApiKeyPolicy } from "../types";
 import { Modal } from "../components/Modal";
 import { ConfirmDialog } from "../components/ConfirmDialog";
 
 export function KeysView({ data }: { data: ConsoleData }) {
-  const { apiKeys, busy, lastCreatedKey, createKey, toggleKey, deleteKey, updateKeyMeta, updateKeyPolicy, copyCreatedKey, copyStoredKey } = data;
+  const {
+    apiKeys,
+    busy,
+    lastCreatedKey,
+    createKey,
+    toggleKey,
+    deleteKey,
+    updateKeyMeta,
+    updateKeyPolicy,
+    copyCreatedKey,
+    copyStoredKey,
+  } = data;
   const [newName, setNewName] = useState("默认用户");
   const [search, setSearch] = useState("");
   const [metaTarget, setMetaTarget] = useState<ApiKeyItem | null>(null);
@@ -16,104 +36,156 @@ export function KeysView({ data }: { data: ConsoleData }) {
   const visible = useMemo(() => {
     const q = search.trim().toLowerCase();
     if (!q) return apiKeys;
-    return apiKeys.filter((k) => [k.name, k.keyPrefix, k.description || "", ...k.labels].join(" ").toLowerCase().includes(q));
+    return apiKeys.filter((k) =>
+      [k.name, k.keyPrefix, k.description || "", ...k.labels].join(" ").toLowerCase().includes(q)
+    );
   }, [apiKeys, search]);
 
   return (
     <div className="space-y-4">
-      <div className="card bg-base-100 shadow-sm">
-        <div className="card-body gap-4">
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+      >
+        <Card className="p-4">
           <div className="flex flex-wrap items-center gap-2">
-            <input className="input input-bordered input-sm w-44" value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="新 Key 名称" />
-            <button className="btn btn-primary btn-sm" disabled={busy} onClick={() => createKey(newName)}>
-              <Plus size={16} /> 创建 Key
-            </button>
-            <input className="input input-bordered input-sm ml-auto w-64" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="搜索名称、前缀、备注或标签" />
+            <div className="flex items-center gap-2">
+              <div className="relative">
+                <KeyRound size={15} className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                <Input className="pl-8 w-44" value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="新 Key 名称" />
+              </div>
+              <Button size="sm" disabled={busy} onClick={() => createKey(newName)}>
+                <Plus size={16} /> 创建 Key
+              </Button>
+            </div>
+            <Input className="ml-auto w-64" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="搜索名称、前缀、备注或标签" />
           </div>
 
           {lastCreatedKey && (
-            <div className="alert alert-success">
-              <KeyRound size={18} />
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              className="mt-4 flex items-center gap-3 rounded-md border border-success/25 bg-success/[0.08] p-3"
+            >
+              <KeyRound size={18} className="shrink-0 text-success" />
               <div className="min-w-0 flex-1">
-                <div className="text-xs font-semibold">新建 Key 明文（仅显示一次）</div>
-                <code className="block truncate text-sm">{lastCreatedKey}</code>
+                <div className="text-xs font-medium text-success">新建 Key 明文（仅显示一次）</div>
+                <code className="block truncate font-mono text-sm">{lastCreatedKey}</code>
               </div>
-              <button className="btn btn-sm" onClick={() => copyCreatedKey()}>
+              <Button size="sm" variant="outline" onClick={() => copyCreatedKey()}>
                 <Copy size={14} /> 复制
-              </button>
-            </div>
+              </Button>
+            </motion.div>
           )}
-        </div>
-      </div>
+        </Card>
+      </motion.div>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+      <motion.div
+        variants={staggerContainer}
+        initial="hidden"
+        animate="show"
+        className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3"
+      >
         {visible.map((key) => (
-          <div key={key.id} className={`card bg-base-100 shadow-sm ${key.enabled ? "" : "opacity-60"}`}>
-            <div className="card-body gap-3 p-4">
+          <motion.div key={key.id} variants={fadeUp} layout>
+            <Card className={cn("h-full p-4", !key.enabled && "opacity-60")}>
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
                     <strong className="truncate">{key.name}</strong>
-                    <span className={`badge badge-sm ${key.enabled ? "badge-success" : "badge-ghost"}`}>{key.enabled ? "启用" : "禁用"}</span>
+                    <Badge variant={key.enabled ? "success" : "muted"}>{key.enabled ? "启用" : "禁用"}</Badge>
                   </div>
-                  <code className="text-xs text-base-content/50">{key.keyPrefix}</code>
+                  <code className="font-mono text-xs text-muted-foreground">{key.keyPrefix}</code>
                 </div>
-                <ShieldCheck size={18} className="shrink-0 text-base-content/30" />
+                <ShieldCheck size={18} className="shrink-0 text-muted-foreground/40" />
               </div>
 
-              <p className="text-xs text-base-content/60">{key.description || "无备注"}</p>
+              <p className="mt-3 text-xs text-muted-foreground">{key.description || "无备注"}</p>
               {key.labels.length > 0 && (
-                <div className="flex flex-wrap gap-1">
+                <div className="mt-2 flex flex-wrap gap-1">
                   {key.labels.map((label) => (
-                    <span key={label} className="badge badge-outline badge-sm">
+                    <Badge key={label} variant="outline">
                       #{label}
-                    </span>
+                    </Badge>
                   ))}
                 </div>
               )}
 
-              <div className="oph-inset grid grid-cols-3 gap-2 p-2 text-center text-xs">
+              <div className="mt-3 grid grid-cols-3 gap-2 rounded-md border border-border bg-muted/30 p-2 text-center text-xs">
                 <div>
-                  <div className="text-base-content/50">请求</div>
+                  <div className="text-muted-foreground">请求</div>
                   <div className="font-semibold tabular-nums">{key.requestCount}</div>
                 </div>
                 <div>
-                  <div className="text-base-content/50">RPM</div>
+                  <div className="text-muted-foreground">RPM</div>
                   <div className="font-semibold tabular-nums">{key.policy.requestsPerMinute ?? "默认"}</div>
                 </div>
                 <div>
-                  <div className="text-base-content/50">客户端</div>
+                  <div className="text-muted-foreground">客户端</div>
                   <div className="font-semibold tabular-nums">{key.recentClients.length}</div>
                 </div>
               </div>
 
-              <div className="text-[11px] text-base-content/40">最近使用：{key.lastUsedAt || "从未使用"}</div>
+              <div className="mt-3 text-[11px] text-muted-foreground/70">最近使用：{key.lastUsedAt || "从未使用"}</div>
 
-              <div className="flex flex-wrap gap-1">
-                <button className="btn btn-ghost btn-xs" disabled={busy || !key.hasRecoverableKey} onClick={() => copyStoredKey(key)} title={key.hasRecoverableKey ? "复制明文" : "该 Key 未保存明文"}>
+              <div className="mt-3 flex flex-wrap gap-1.5">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  disabled={busy || !key.hasRecoverableKey}
+                  onClick={() => copyStoredKey(key)}
+                  title={key.hasRecoverableKey ? "复制明文" : "该 Key 未保存明文"}
+                >
                   <Copy size={13} /> 复制
-                </button>
-                <button className="btn btn-ghost btn-xs" disabled={busy} onClick={() => setMetaTarget(key)}>
+                </Button>
+                <Button variant="ghost" size="sm" disabled={busy} onClick={() => setMetaTarget(key)}>
                   <Pencil size={13} /> 备注
-                </button>
-                <button className="btn btn-ghost btn-xs" disabled={busy} onClick={() => setPolicyTarget(key)}>
+                </Button>
+                <Button variant="ghost" size="sm" disabled={busy} onClick={() => setPolicyTarget(key)}>
                   <SlidersHorizontal size={13} /> 策略
-                </button>
-                <button className="btn btn-ghost btn-xs" disabled={busy} onClick={() => toggleKey(key)}>
+                </Button>
+                <Button variant="ghost" size="sm" disabled={busy} onClick={() => toggleKey(key)}>
                   {key.enabled ? "禁用" : "启用"}
-                </button>
-                <button className="btn btn-ghost btn-xs text-error" disabled={busy} onClick={() => setDeleteTarget(key)}>
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-destructive hover:text-destructive"
+                  disabled={busy}
+                  onClick={() => setDeleteTarget(key)}
+                >
                   <Trash2 size={13} /> 删除
-                </button>
+                </Button>
               </div>
-            </div>
-          </div>
+            </Card>
+          </motion.div>
         ))}
-        {visible.length === 0 && <p className="text-sm text-base-content/40">没有匹配的 API Key</p>}
-      </div>
+        {visible.length === 0 && <p className="text-sm text-muted-foreground/70">没有匹配的 API Key</p>}
+      </motion.div>
 
-      {metaTarget && <MetaModal target={metaTarget} busy={busy} onClose={() => setMetaTarget(null)} onSave={(desc, labels) => { updateKeyMeta(metaTarget, desc, labels); setMetaTarget(null); }} />}
-      {policyTarget && <PolicyModal target={policyTarget} busy={busy} onClose={() => setPolicyTarget(null)} onSave={(policy) => { updateKeyPolicy(policyTarget, policy); setPolicyTarget(null); }} />}
+      {metaTarget && (
+        <MetaModal
+          target={metaTarget}
+          busy={busy}
+          onClose={() => setMetaTarget(null)}
+          onSave={(desc, labels) => {
+            updateKeyMeta(metaTarget, desc, labels);
+            setMetaTarget(null);
+          }}
+        />
+      )}
+      {policyTarget && (
+        <PolicyModal
+          target={policyTarget}
+          busy={busy}
+          onClose={() => setPolicyTarget(null)}
+          onSave={(policy) => {
+            updateKeyPolicy(policyTarget, policy);
+            setPolicyTarget(null);
+          }}
+        />
+      )}
       <ConfirmDialog
         open={Boolean(deleteTarget)}
         title="删除 API Key"
@@ -121,37 +193,72 @@ export function KeysView({ data }: { data: ConsoleData }) {
         confirmText="删除"
         busy={busy}
         onCancel={() => setDeleteTarget(null)}
-        onConfirm={() => { if (deleteTarget) deleteKey(deleteTarget); setDeleteTarget(null); }}
+        onConfirm={() => {
+          if (deleteTarget) deleteKey(deleteTarget);
+          setDeleteTarget(null);
+        }}
       />
     </div>
   );
 }
 
-function MetaModal({ target, busy, onClose, onSave }: { target: ApiKeyItem; busy: boolean; onClose: () => void; onSave: (desc: string, labels: string[]) => void }) {
+function MetaModal({
+  target,
+  busy,
+  onClose,
+  onSave,
+}: {
+  target: ApiKeyItem;
+  busy: boolean;
+  onClose: () => void;
+  onSave: (desc: string, labels: string[]) => void;
+}) {
   const [desc, setDesc] = useState(target.description || "");
   const [labels, setLabels] = useState(target.labels.join(", "));
   return (
-    <Modal open title={`编辑「${target.name}」`} icon={<Pencil size={18} className="text-primary" />} onClose={onClose}
+    <Modal
+      open
+      title={`编辑「${target.name}」`}
+      icon={<Pencil size={18} className="text-primary" />}
+      onClose={onClose}
       footer={
         <>
-          <button className="btn btn-ghost btn-sm" onClick={onClose} disabled={busy}>取消</button>
-          <button className="btn btn-primary btn-sm" disabled={busy} onClick={() => onSave(desc, labels.split(",").map((l) => l.trim()).filter(Boolean))}>保存</button>
+          <Button variant="ghost" size="sm" onClick={onClose} disabled={busy}>
+            取消
+          </Button>
+          <Button
+            size="sm"
+            disabled={busy}
+            onClick={() => onSave(desc, labels.split(",").map((l) => l.trim()).filter(Boolean))}
+          >
+            保存
+          </Button>
         </>
       }
     >
-      <label className="form-control">
-        <span className="label-text mb-1 text-sm">备注</span>
-        <input className="input input-bordered" value={desc} onChange={(e) => setDesc(e.target.value)} placeholder="用途说明" />
-      </label>
-      <label className="form-control">
-        <span className="label-text mb-1 text-sm">标签（逗号分隔）</span>
-        <input className="input input-bordered" value={labels} onChange={(e) => setLabels(e.target.value)} placeholder="prod, team-a" />
-      </label>
+      <div className="space-y-1.5">
+        <Label>备注</Label>
+        <Input value={desc} onChange={(e) => setDesc(e.target.value)} placeholder="用途说明" />
+      </div>
+      <div className="space-y-1.5">
+        <Label>标签（逗号分隔）</Label>
+        <Input value={labels} onChange={(e) => setLabels(e.target.value)} placeholder="prod, team-a" />
+      </div>
     </Modal>
   );
 }
 
-function PolicyModal({ target, busy, onClose, onSave }: { target: ApiKeyItem; busy: boolean; onClose: () => void; onSave: (policy: ApiKeyPolicy) => void }) {
+function PolicyModal({
+  target,
+  busy,
+  onClose,
+  onSave,
+}: {
+  target: ApiKeyItem;
+  busy: boolean;
+  onClose: () => void;
+  onSave: (policy: ApiKeyPolicy) => void;
+}) {
   const p = target.policy;
   const [rpm, setRpm] = useState(p.requestsPerMinute?.toString() ?? "");
   const [maxReq, setMaxReq] = useState(p.maxConcurrentRequests?.toString() ?? "");
@@ -174,35 +281,43 @@ function PolicyModal({ target, busy, onClose, onSave }: { target: ApiKeyItem; bu
   };
 
   return (
-    <Modal open title={`策略「${target.name}」`} icon={<SlidersHorizontal size={18} className="text-primary" />} onClose={onClose}
+    <Modal
+      open
+      title={`策略「${target.name}」`}
+      icon={<SlidersHorizontal size={18} className="text-primary" />}
+      onClose={onClose}
       footer={
         <>
-          <button className="btn btn-ghost btn-sm" onClick={onClose} disabled={busy}>取消</button>
-          <button className="btn btn-primary btn-sm" disabled={busy} onClick={submit}>保存策略</button>
+          <Button variant="ghost" size="sm" onClick={onClose} disabled={busy}>
+            取消
+          </Button>
+          <Button size="sm" disabled={busy} onClick={submit}>
+            保存策略
+          </Button>
         </>
       }
     >
-      <p className="text-xs text-base-content/50">留空字段继承全局默认值。</p>
+      <p className="text-xs text-muted-foreground">留空字段继承全局默认值。</p>
       <div className="grid grid-cols-3 gap-2">
-        <label className="form-control">
-          <span className="label-text mb-1 text-xs">每分钟请求</span>
-          <input className="input input-bordered input-sm" type="number" value={rpm} onChange={(e) => setRpm(e.target.value)} placeholder="默认" />
-        </label>
-        <label className="form-control">
-          <span className="label-text mb-1 text-xs">并发请求</span>
-          <input className="input input-bordered input-sm" type="number" value={maxReq} onChange={(e) => setMaxReq(e.target.value)} placeholder="默认" />
-        </label>
-        <label className="form-control">
-          <span className="label-text mb-1 text-xs">并发流</span>
-          <input className="input input-bordered input-sm" type="number" value={maxStream} onChange={(e) => setMaxStream(e.target.value)} placeholder="默认" />
-        </label>
+        <div className="space-y-1.5">
+          <Label className="text-xs text-muted-foreground">每分钟请求</Label>
+          <Input type="number" value={rpm} onChange={(e) => setRpm(e.target.value)} placeholder="默认" />
+        </div>
+        <div className="space-y-1.5">
+          <Label className="text-xs text-muted-foreground">并发请求</Label>
+          <Input type="number" value={maxReq} onChange={(e) => setMaxReq(e.target.value)} placeholder="默认" />
+        </div>
+        <div className="space-y-1.5">
+          <Label className="text-xs text-muted-foreground">并发流</Label>
+          <Input type="number" value={maxStream} onChange={(e) => setMaxStream(e.target.value)} placeholder="默认" />
+        </div>
       </div>
-      <label className="form-control">
-        <span className="label-text mb-1 text-sm">允许模型（逗号分隔，空=全部）</span>
-        <input className="input input-bordered" value={models} onChange={(e) => setModels(e.target.value)} placeholder="deepseek-v4-flash-free, ..." />
-      </label>
+      <div className="space-y-1.5">
+        <Label>允许模型（逗号分隔，空=全部）</Label>
+        <Input value={models} onChange={(e) => setModels(e.target.value)} placeholder="deepseek-v4-flash-free, ..." />
+      </div>
       <label className="flex cursor-pointer items-center gap-2">
-        <input type="checkbox" className="toggle toggle-primary toggle-sm" checked={allowProxy} onChange={(e) => setAllowProxy(e.target.checked)} />
+        <Switch checked={allowProxy} onCheckedChange={setAllowProxy} />
         <span className="text-sm">允许使用出口代理</span>
       </label>
     </Modal>
