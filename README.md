@@ -160,7 +160,7 @@ npm start            # 运行已构建的 dist/main.js
 | 代理 | `https-proxy-agent`、`socks-proxy-agent` + 自研链式前置代理 Agent |
 | 限流/状态 | 内存实现，或可选 Redis（`redis`）|
 | 配置 | `dotenv` + JSON 文件持久化（api-keys / models / settings / proxies）|
-| 前端 | React 19、Vite 6、Tailwind CSS 3、daisyUI 4、lucide-react |
+| 前端 | React 19、Vite 6、Tailwind CSS 3、shadcn/ui（Radix）、Motion、Recharts、lucide-react |
 | 部署 | Docker、Docker Compose（`node:20-alpine`）|
 | 许可证 | MIT |
 
