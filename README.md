@@ -161,7 +161,7 @@ npm start            # 运行已构建的 dist/main.js
 | 限流/状态 | 内存实现，或可选 Redis（`redis`）|
 | 配置 | `dotenv` + JSON 文件持久化（api-keys / models / settings / proxies）|
 | 前端 | React 19、Vite 6、Tailwind CSS 3、shadcn/ui（Radix）、Motion、Recharts、lucide-react |
-| 部署 | Docker、Docker Compose（`node:20-alpine`）|
+| 部署 | Docker、Docker Compose（`node:20-bookworm-slim`，linux/amd64 + linux/arm64）|
 | 许可证 | MIT |
 
 ## 项目架构与逻辑
