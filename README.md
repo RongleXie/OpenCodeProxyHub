@@ -34,6 +34,7 @@ OpenCodeProxyHub 默认内置以下免费模型，均可通过 OpenAI 兼容接�
 | `nemotron-3-ultra-free` | Nvidia Nemotron 3 Ultra 免费模型 |
 | `mimo-v2.5-free` | Mimo v2.5 免费模型 |
 | `north-mini-code-free` | Cohere North Mini Code 免费模型 |
+| `hy3-free` | Tencent HY3 免费模型 |
 
 新部署会自动生成以上默认模型；已有部署升级后，缺失的默认免费模型会自动追加到已有 `models.json`，不会覆盖用户已修改的模型配置。已下线的模型（如 `nemotron-3-super-free`、`minimax-m3-free`）会在升级时自动禁用并标记下线原因，用户无需手动清理。
 
@@ -117,7 +118,7 @@ npm start            # 运行已构建的 dist/main.js
   - OpenAI 兼容：`POST /v1/chat/completions`、`GET /v1/models`
   - Anthropic 兼容：`POST /v1/messages`
   - 同时支持流式（SSE）与非流式
-- **默认免费模型**：内置 5 个可用免费模型，详见上方“可用免费模型”
+- **默认免费模型**：内置 6 个可用免费模型，详见上方“可用免费模型”
 - **流式归一化转换（可按模型开启）**
   - `anthropic-sse-to-openai`：把上游的 Anthropic 风格 SSE 转成 OpenAI 风格 SSE
   - `think-to-reasoning`：把内联在 `delta.content` 里的 `<think>...</think>` 推理内容抽取到 `reasoning_content` 字段，正文只保留答案（支持标签跨 chunk 的状态机处理）
@@ -434,6 +435,7 @@ OpenCodeProxyHub 独立维护，与 OpenCode、`opencode-free-proxy` 及任何�
 
 ## 更新记录
 
+- **v0.1.3**：新增 `hy3-free` 默认免费模型；已有部署升级后自动追加，无需改 `models.json`
 - **v0.1.2**：移除已下线的 `nemotron-3-super-free` 和 `minimax-m3-free`，新增 `north-mini-code-free`；升级时自动禁用已下线模型
 - **v0.1.1**：新增 Nemotron 3 Ultra 默认模型、运行时代理模式
 - **v0.1.0**：初始发布

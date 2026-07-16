@@ -6,6 +6,7 @@ export const DEFAULT_MODELS = [
   "nemotron-3-ultra-free",
   "mimo-v2.5-free",
   "north-mini-code-free",
+  "hy3-free",
 ] as const;
 
 /**
