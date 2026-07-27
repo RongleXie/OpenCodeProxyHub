@@ -6,7 +6,8 @@ export const DEFAULT_MODELS = [
   "nemotron-3-ultra-free",
   "mimo-v2.5-free",
   "north-mini-code-free",
-  "hy3-free",
+  "laguna-s-2.1-free",
+  "ling-3.0-flash-free",
 ] as const;
 
 /**
@@ -16,6 +17,7 @@ export const DEFAULT_MODELS = [
 export const RETIRED_MODELS: ReadonlyArray<{ id: string; reason: string }> = [
   { id: "nemotron-3-super-free", reason: "Model no longer supported by upstream" },
   { id: "minimax-m3-free", reason: "Free promotion ended, now requires OpenCode Go subscription" },
+  { id: "hy3-free", reason: "Model discontinued by upstream" },
 ];
 
 export interface ModelConfig {
