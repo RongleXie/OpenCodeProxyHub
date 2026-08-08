@@ -38,6 +38,8 @@ OpenCodeProxyHub 默认内置以下免费模型，均可通过 OpenAI 兼容接�
 | `ling-3.0-flash-free` | Ling 3.0 Flash 免费模型 |
 | `longcat-2.0-free` | LongCat 2.0 免费模型 |
 
+> **上下文说明**：`deepseek-v4-flash-free` 实测支持约 **1M token** 上下文（models.dev 标注的 200K 仅为推荐值，Zen 服务端未按其硬截断），适合长上下文/长文档任务。
+
 新部署会自动生成以上默认模型；已有部署升级后，缺失的默认免费模型会自动追加到已有 `models.json`，不会覆盖用户已修改的模型配置。已下线的模型（如 `nemotron-3-super-free`、`minimax-m3-free`）会在升级时自动禁用并标记下线原因，用户无需手动清理。
 
 ## 部署方式
