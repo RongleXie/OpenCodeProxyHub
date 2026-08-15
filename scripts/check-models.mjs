@@ -10,11 +10,10 @@ const MODELS = [
   "deepseek-v4-flash-free",
   "big-pickle",
   "nemotron-3-ultra-free",
+  "nemotron-3.5-lightning-free",
   "mimo-v2.5-free",
-  "north-mini-code-free",
+  "hy3-free",
   "laguna-s-2.1-free",
-  "ling-3.0-flash-free",
-  "longcat-2.0-free",
 ];
 
 const ocId = (prefix) => {

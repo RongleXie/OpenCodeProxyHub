@@ -4,11 +4,10 @@ export const DEFAULT_MODELS = [
   "deepseek-v4-flash-free",
   "big-pickle",
   "nemotron-3-ultra-free",
+  "nemotron-3.5-lightning-free",
   "mimo-v2.5-free",
-  "north-mini-code-free",
+  "hy3-free",
   "laguna-s-2.1-free",
-  "ling-3.0-flash-free",
-  "longcat-2.0-free",
 ] as const;
 
 /**
@@ -18,8 +17,18 @@ export const DEFAULT_MODELS = [
 export const RETIRED_MODELS: ReadonlyArray<{ id: string; reason: string }> = [
   { id: "nemotron-3-super-free", reason: "Model no longer supported by upstream" },
   { id: "minimax-m3-free", reason: "Free promotion ended, now requires OpenCode Go subscription" },
-  { id: "hy3-free", reason: "Model discontinued by upstream" },
+  { id: "north-mini-code-free", reason: "Model no longer offered as a free model by upstream" },
+  { id: "ling-3.0-flash-free", reason: "Model no longer offered as a free model by upstream" },
+  { id: "longcat-2.0-free", reason: "Model no longer offered as a free model by upstream" },
 ];
+
+/**
+ * Models previously auto-disabled by the retirement mechanism that are
+ * available again as upstream free models. On startup, entries carrying the
+ * "(retired:" annotation are re-enabled and the annotation is stripped, so
+ * only auto-disabled entries are touched — manual user choices are kept.
+ */
+export const REACTIVATED_MODELS: ReadonlySet<string> = new Set(["hy3-free"]);
 
 export interface ModelConfig {
   id: string;
@@ -115,6 +124,15 @@ export class ModelConfigStore {
         model.enabled = false;
         model.displayName = `${model.displayName || model.id} (retired: ${retired.reason})`;
       }
+    }
+    // Re-enable models that returned to the upstream free list and were
+    // previously auto-disabled via the retirement mechanism
+    for (const model of merged) {
+      if (!REACTIVATED_MODELS.has(model.id)) continue;
+      if (model.enabled || !model.displayName?.includes("(retired:")) continue;
+      model.enabled = true;
+      const cleaned = model.displayName.replace(/\s*\(retired:[^)]*\)/g, "").trim();
+      model.displayName = cleaned === model.id ? undefined : cleaned;
     }
     return merged;
   }
