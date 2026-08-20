@@ -62,7 +62,7 @@ export function Sidebar({ view, onSelect }: { view: View; onSelect: (view: View)
         })}
       </nav>
 
-      <div className="hidden px-4 py-4 text-[11px] text-muted-foreground/60 md:block">v0.1.6 · MIT</div>
+      <div className="hidden px-4 py-4 text-[11px] text-muted-foreground/60 md:block">v0.1.7 · MIT</div>
     </aside>
   );
 }

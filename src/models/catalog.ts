@@ -8,6 +8,8 @@ export const DEFAULT_MODELS = [
   "mimo-v2.5-free",
   "hy3-free",
   "laguna-s-2.1-free",
+  "x-preview-f-free",
+  "muse-spark-1.2-contributor-free",
 ] as const;
 
 /**
