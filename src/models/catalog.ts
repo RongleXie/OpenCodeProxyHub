@@ -1,14 +1,11 @@
-﻿import { JsonFileStore } from "../storage/jsonFile.js";
+import { JsonFileStore } from "../storage/jsonFile.js";
 
 export const DEFAULT_MODELS = [
-  "deepseek-v4-flash-free",
   "big-pickle",
   "nemotron-3-ultra-free",
   "nemotron-3.5-lightning-free",
   "mimo-v2.5-free",
-  "hy3-free",
   "laguna-s-2.1-free",
-  "x-preview-f-free",
   "muse-spark-1.2-contributor-free",
 ] as const;
 
@@ -22,6 +19,9 @@ export const RETIRED_MODELS: ReadonlyArray<{ id: string; reason: string }> = [
   { id: "north-mini-code-free", reason: "Model no longer offered as a free model by upstream" },
   { id: "ling-3.0-flash-free", reason: "Model no longer offered as a free model by upstream" },
   { id: "longcat-2.0-free", reason: "Model no longer offered as a free model by upstream" },
+  { id: "deepseek-v4-flash-free", reason: "Free promotion ended, no longer offered as a free model by upstream" },
+  { id: "hy3-free", reason: "Model no longer offered as a free model by upstream" },
+  { id: "x-preview-f-free", reason: "Model no longer offered as a free model by upstream" },
 ];
 
 /**
@@ -29,8 +29,9 @@ export const RETIRED_MODELS: ReadonlyArray<{ id: string; reason: string }> = [
  * available again as upstream free models. On startup, entries carrying the
  * "(retired:" annotation are re-enabled and the annotation is stripped, so
  * only auto-disabled entries are touched — manual user choices are kept.
+ * Currently empty (no model is known to have returned as of v0.1.8).
  */
-export const REACTIVATED_MODELS: ReadonlySet<string> = new Set(["hy3-free"]);
+export const REACTIVATED_MODELS: ReadonlySet<string> = new Set([]);
 
 export interface ModelConfig {
   id: string;

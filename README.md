@@ -29,21 +29,16 @@ OpenCodeProxyHub 默认内置以下免费模型，均可通过 OpenAI 兼容接�
 
 | 模型 ID | 说明 |
 |--------|------|
-| `deepseek-v4-flash-free` | DeepSeek 免费模型 |
 | `big-pickle` | OpenCode 免费模型（stealth） |
 | `nemotron-3-ultra-free` | Nvidia Nemotron 3 Ultra 免费模型 |
 | `nemotron-3.5-lightning-free` | Nvidia Nemotron 3.5 Lightning 免费模型 |
 | `mimo-v2.5-free` | Mimo v2.5 免费模型 |
-| `hy3-free` | Hy3 免费模型 |
 | `laguna-s-2.1-free` | Laguna S 2.1 免费模型 |
-| `x-preview-f-free` | Ox Alpha 免费模型（stealth，零保留） |
 | `muse-spark-1.2-contributor-free` | Muse Spark 1.2 Contributor 免费模型 |
 
-> **上下文说明**：`deepseek-v4-flash-free` 实测支持约 **1M token** 上下文（models.dev 标注的 200K 仅为推荐值，Zen 服务端未按其硬截断），适合长上下文/长文档任务。
+> **区域说明**：`muse-spark-1.2-contributor-free` 部分区域可能被上游按地区限制（实测部分地区返回 403）；若所在区域不可用，可配合出口代理或直接禁用该模型。该模型为 Contributor 定价（以 prompt/completion 换训练授权），使用前请阅读相关条款。
 
-> **区域说明**：`muse-spark-1.2-contributor-free` 与 `x-preview-f-free` 部分区域可能被上游按地区限制（实测部分地区返回 403）；若所在区域不可用，可配合出口代理或直接禁用该模型。`x-preview-f-free` 上游为零保留策略，`muse-spark-1.2-contributor-free` 为 Contributor 定价（以 prompt/completion 换训练授权），使用前请阅读相关条款。
-
-新部署会自动生成以上默认模型；已有部署升级后，缺失的默认免费模型会自动追加到已有 `models.json`，不会覆盖用户已修改的模型配置。已下线的模型（如 `north-mini-code-free`、`ling-3.0-flash-free`、`longcat-2.0-free`）会在升级时自动禁用并标记下线原因，用户无需手动清理。重新上线的模型（如 `hy3-free`）升级后会自动重新启用；仅恢复此前被自动禁用的条目，用户手动关闭的不受影响。
+新部署会自动生成以上默认模型；已有部署升级后，缺失的默认免费模型会自动追加到已有 `models.json`，不会覆盖用户已修改的模型配置。已下线的模型（如 `deepseek-v4-flash-free`、`hy3-free`、`x-preview-f-free`、`north-mini-code-free`、`ling-3.0-flash-free`、`longcat-2.0-free`）会在升级时自动禁用并标记下线原因，用户无需手动清理。此前被自动禁用的模型若重新上线，升级后会仅恢复带下线标注的条目自动重新启用；用户手动关闭的不受影响。
 
 ## 部署方式
 
@@ -125,7 +120,7 @@ npm start            # 运行已构建的 dist/main.js
   - OpenAI 兼容：`POST /v1/chat/completions`、`GET /v1/models`
   - Anthropic 兼容：`POST /v1/messages`
   - 同时支持流式（SSE）与非流式
-- **默认免费模型**：内置 9 个可用免费模型，详见上方“可用免费模型”
+- **默认免费模型**：内置 6 个可用免费模型，详见上方“可用免费模型”
 - **流式归一化转换（可按模型开启）**
   - `anthropic-sse-to-openai`：把上游的 Anthropic 风格 SSE 转成 OpenAI 风格 SSE
   - `think-to-reasoning`：把内联在 `delta.content` 里的 `<think>...</think>` 推理内容抽取到 `reasoning_content` 字段，正文只保留答案（支持标签跨 chunk 的状态机处理）
@@ -442,6 +437,7 @@ OpenCodeProxyHub 独立维护，与 OpenCode、`opencode-free-proxy` 及任何�
 
 ## 更新记录
 
+- **v0.1.8**：同步官方 Zen 免费模型：退役 `deepseek-v4-flash-free`（免费期结束，上游 400 不可用）、`hy3-free`（再次下线，上游 401）、`x-preview-f-free`（Ox Alpha，上游 401 不可用）；`muse-spark-1.2-contributor-free` 保留启用（注意本地区可能 403）。默认免费模型更新为 6 个。升级后自动禁用退役模型、追加缺失默认模型，不覆盖用户已有配置
 - **v0.1.7**：同步官方 Zen 免费模型：新增 `x-preview-f-free`（Ox Alpha）与 `muse-spark-1.2-contributor-free`（Muse Spark 1.2 Contributor）两个默认免费模型；`deepseek-v4-flash-free`、`laguna-s-2.1-free` 经实测仍可用，保留不动。升级后新模型自动追加，不覆盖用户已有配置
 - **v0.1.6**：同步官方 Zen 免费模型：恢复 `hy3-free`，新增 `nemotron-3.5-lightning-free`；退役 `north-mini-code-free`、`ling-3.0-flash-free`、`longcat-2.0-free`。升级后自动追加/禁用，不覆盖用户已有配置；此前被自动禁用的 `hy3-free` 升级后自动重新启用（手动关闭的不受影响）
 - **v0.1.5**：新增 `longcat-2.0-free` 默认免费模型；已有部署升级后自动追加，无需改 `models.json`（已实测上游可用，端到端验证通过）
