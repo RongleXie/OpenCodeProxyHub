@@ -314,7 +314,7 @@ function PolicyModal({
       </div>
       <div className="space-y-1.5">
         <Label>允许模型（逗号分隔，空=全部）</Label>
-        <Input value={models} onChange={(e) => setModels(e.target.value)} placeholder="deepseek-v4-flash-free, ..." />
+        <Input value={models} onChange={(e) => setModels(e.target.value)} placeholder="big-pickle, ling-3.0-flash-fin-free, ..." />
       </div>
       <label className="flex cursor-pointer items-center gap-2">
         <Switch checked={allowProxy} onCheckedChange={setAllowProxy} />

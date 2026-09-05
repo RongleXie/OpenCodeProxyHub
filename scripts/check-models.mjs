@@ -6,15 +6,17 @@ const ZEN_PATH = "/zen/v1/chat/completions";
 const OC_VERSION = "1.15.0";
 const TIMEOUT_MS = 120000;
 
-// 当前默认免费模型（v0.1.8）
+// 当前默认免费模型（v0.1.9）
 const MODELS = [
   "big-pickle",
   "nemotron-3-ultra-free",
   "nemotron-3.5-lightning-free",
   "mimo-v2.5-free",
+  "ling-3.0-flash-fin-free",
+  "muse-spark-1.3-contributor-free",
+  // 已退役/不可用，保留监控是否回归
   "laguna-s-2.1-free",
   "muse-spark-1.2-contributor-free",
-  // 已退役/不可用，保留监控是否回归
   "deepseek-v4-flash-free",
   "hy3-free",
   "x-preview-f-free",

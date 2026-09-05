@@ -4,7 +4,7 @@ import type { ModelConfigStore } from "../models/catalog.js";
 export const registerHealthRoutes = async (app: FastifyInstance, models: ModelConfigStore): Promise<void> => {
   app.get("/health", async () => ({
     status: "ok",
-    version: "0.1.8",
+    version: "0.1.9",
     models: models.listEnabled().length,
     endpoints: ["/v1/chat/completions", "/v1/messages", "/v1/models"],
   }));
